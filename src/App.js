@@ -1,53 +1,44 @@
-import React, {useState} from "react";
+import React, { useState, useRef } from "react";
 import './App.css'
 function App(){
-
+  const locationRef = useRef(null)
   const apiKey = "67fc8d84610a4885a6e41256222107";
   const [weatherData, setWeatherData] = useState([{}])
-  const [city, SetCity] = useState("")
+  let autocomplete;
 
-  const getWeather = (event) =>{
-    if (event.key === "Enter"){
-      fetch(
-        `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          setWeatherData(data);
-        });
-    }
-    else{
-      const autocomplete = new window.google.maps.places.Autocomplete(
+  function initAutocomplete(){
+      autocomplete = new window.google.maps.places.Autocomplete(
         document.getElementById("autocomplete"),
         {
           types: ["(cities)"],
-          fields: ["place_id", "geometry", "name"],
+          fields: ["place_id", "geometry", "name", "formatted_address"],
         }
       );
-     //   autocomplete.addListener('place_changed', onPlaceChanged)
+          autocomplete.addListener('place_changed', onPlaceChanged)
     }
-  }
 
-/*
-  const onPlaceChanged = () => {
-    var place = window.autocomplete.getPlace();
+  function onPlaceChanged() {
+    var place = autocomplete.getPlace();
     if (!place.geometry) {
-      document.getElementById("autocomplete").placeholder = "Enter a place";
+      document.getElementById("autocomplete").placeholder = "Enter a City";
     } else {
-      document.getElementById("details").innerHTML = place.name;
-    }
-  };
-*/
+      fetch(
+        `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${place.formatted_address}&aqi=no`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          setWeatherData(data);
+        }); 
+  }}
 
-  function handleSubmit(e) {
-    e.preventDefault();
+
+  function handleSubmit (e) {
+      e.preventDefault();
      fetch(
-       `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`
+       `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${locationRef.current.value}&aqi=no`
      )
        .then((response) => response.json())
        .then((data) => {
-         console.log(data);
          setWeatherData(data);
        }); 
   }
@@ -56,18 +47,19 @@ function App(){
   return (
     <div className="container">
       <div className="input">
-        <form onSubmit={handleSubmit}>
+        <form id="form" onSubmit={handleSubmit}>
           <input
             className="input"
             id="autocomplete"
-            placeholder="Enter Location..."
-            onChange={(e) => SetCity(e.target.value)}
-            onKeyPress={getWeather}
+            placeholder="Enter a City..."
+            ref={locationRef}
+            onKeyPress={initAutocomplete}
           />
           <button type="submit">Submit</button>
         </form>
       </div>
-      {typeof weatherData.main === "undefined" ? (
+
+      {typeof weatherData.location === "undefined" ? (
         <div>
           <p>
             Welcome to my Weather app! Enter in a City to get the weather
@@ -76,11 +68,12 @@ function App(){
         </div>
       ) : (
         <div>
-          <p>{weatherData.name}</p>
-          <p>{Math.round(weatherData.main.temp)}F</p>
-          <p>{weatherData.weather[0].main}</p>
+          <p>{weatherData.location.name}</p>
+          <p>{Math.round(weatherData.current.temp_f)}F</p>
         </div>
       )}
+
+
     </div>
   );
 }
