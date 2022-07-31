@@ -1,12 +1,21 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import './App.css'
 function App(){
   const locationRef = useRef(null)
-  const apiKey = "67fc8d84610a4885a6e41256222107";
   const [weatherData, setWeatherData] = useState([{}])
   let autocomplete;
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initAutocomplete`;
+    script.async = true;
+    document.body.appendChild(script);
+
+  }, []);
+
+
   function initAutocomplete(){
+    
       autocomplete = new window.google.maps.places.Autocomplete(
         document.getElementById("autocomplete"),
         {
@@ -23,7 +32,7 @@ function App(){
       document.getElementById("autocomplete").placeholder = "Enter a City";
     } else {
       fetch(
-        `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${place.formatted_address}&aqi=no`
+        `/weather?q=${place.formatted_address}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -34,9 +43,7 @@ function App(){
 
   function handleSubmit (e) {
       e.preventDefault();
-     fetch(
-       `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${locationRef.current.value}&aqi=no`
-     )
+     fetch(`/weather?q=${locationRef.current.value}`)
        .then((response) => response.json())
        .then((data) => {
          setWeatherData(data);
