@@ -4,10 +4,15 @@ function App(){
   const locationRef = useRef(null)
   const [weatherData, setWeatherData] = useState([{}])
   let autocomplete;
+  
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initAutocomplete`;
+     fetch("/weather/google")
+       .then((response) => response.text())
+       .then((data) => {
+         script.src = data;
+       });
     script.async = true;
     document.body.appendChild(script);
 
@@ -15,7 +20,6 @@ function App(){
 
 
   function initAutocomplete(){
-    
       autocomplete = new window.google.maps.places.Autocomplete(
         document.getElementById("autocomplete"),
         {
@@ -84,4 +88,5 @@ function App(){
     </div>
   );
 }
+
 export default App
