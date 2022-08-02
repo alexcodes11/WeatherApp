@@ -3,12 +3,11 @@ import './App.css'
 function App(){
   const locationRef = useRef(null)
   const [weatherData, setWeatherData] = useState([{}])
-  
+  const script = document.createElement("script");
   let autocomplete;
   
 
   useEffect(() => {
-    const script = document.createElement("script");
      fetch("/weather/google")
        .then((response) => response.text())
        .then((data) => {
@@ -57,7 +56,7 @@ function App(){
 
 
   return (
-    <div class="vh-100" style={{ backgroundColor: "#4B515D" }}>
+    <div className="vh-100" style={{ backgroundColor: "#4B515D" }}>
       <h1>Weather Forecast</h1>
 
       <div className="Letstry">
@@ -118,7 +117,7 @@ function App(){
                       <div className="flex-grow-1" style={{ fontSize: 16 }}>
                         <div>
                           <i
-                            className="fas fa-wind fa-fw"
+                            className="fas fa-fw"
                             style={{ color: "#868B94" }}
                           ></i>
                           <span className="ms-1">
@@ -127,8 +126,8 @@ function App(){
                         </div>
                         <div>
                           <i
-                            className="fas fa-tint fa-fw"
-                            style={{ color: "#868B94;" }}
+                            className="fas fa-fw"
+                            style={{ color: "#868B94" }}
                           ></i>
                           <span className="ms-1">
                             Humidity: {weatherData.current.humidity}%
@@ -136,8 +135,8 @@ function App(){
                         </div>
                         <div>
                           <i
-                            className="fas fa-sun fa-fw"
-                            style={{ color: "#868B94;" }}
+                            className="fas fa-fw"
+                            style={{ color: "#868B94" }}
                           ></i>
                           <span className="ms-1">
                             Feels Like:{" "}
